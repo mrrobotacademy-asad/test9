@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة كودجي - الاختبار الأسبوعي: طرق اتصال تطبيقات الويب</title>
+    <style>
+        :root {
+            --bg-color: #0f0e17;
+            --card-bg: #161625;
+            --text-color: #fffffe;
+            --border-color: #2e2f42;
+            --accent-color: #6c5ce7;
+            --accent-glow: #a29bfe;
+            --success-color: #00b894;
+            --danger-color: #ff6b6b;
+            --warning-color: #fdcb6e;
+            --subtext-color: #a7a9be;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+            padding-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        .top-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .timer-box {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(22,22,37,0.9);
+            border: 1px solid var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+            display: none;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.2);
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--accent-color);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.4);
+            transition: transform 0.2s;
+        }
+        .scroll-top:hover { transform: scale(1.1); }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            background: var(--success-color);
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0,184,148,0.4);
+        }
+        .copy-success.show { display: block; animation: fadeInOut 4s ease forwards; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(50%, -20px); }
+            15% { opacity: 1; transform: translate(50%, 0); }
+            85% { opacity: 1; transform: translate(50%, 0); }
+            100% { opacity: 0; transform: translate(50%, -20px); }
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(108,92,231,0.15) 0%, rgba(15,14,23,0) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img, .instructor-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            object-fit: cover;
+            background: var(--card-bg);
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .brand-text p {
+            color: var(--accent-glow);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(108,92,231,0.2);
+            color: var(--accent-glow);
+            border: 1px solid var(--accent-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 18px;
+            background: transparent;
+            border: none;
+            color: var(--subtext-color);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-nav-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-nav-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .info-block {
+            background: rgba(108,92,231,0.1);
+            border-right: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .info-block.warning {
+            background: rgba(253,203,110,0.1);
+            border-right-color: var(--warning-color);
+        }
+        .info-block.success {
+            background: rgba(0,184,148,0.1);
+            border-right-color: var(--success-color);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,92,231,0.4);
+        }
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-secondary:hover {
+            background: #3e3f58;
+            box-shadow: none;
+        }
+        .btn-success { background: var(--success-color); }
+        .btn-success:hover { box-shadow: 0 5px 15px rgba(0,184,148,0.4); }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 16px 30px;
+            width: 100%;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+        }
+        .btn-copy:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+        }
+
+        .whatsapp-hint {
+            background: rgba(37,211,102,0.1);
+            border: 1px solid rgba(37,211,102,0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #25D366;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.98rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(108,92,231,0.05);
+        }
+
+        .option-item.correct {
+            border-color: var(--success-color);
+            background: rgba(0,184,148,0.15);
+            color: #fff;
+        }
+
+        .option-item.wrong {
+            border-color: var(--danger-color);
+            background: rgba(255,107,107,0.15);
+            color: #fff;
+        }
+
+        .option-item input[type="radio"] {
+            accent-color: var(--accent-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        .essay-textarea {
+            width: 100%;
+            min-height: 140px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+
+        .essay-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .feedback-msg.correct { background: rgba(0,184,148,0.2); color: var(--success-color); }
+        .feedback-msg.wrong { background: rgba(255,107,107,0.2); color: var(--danger-color); }
+
+        .report-details { margin-top: 20px; }
+        .q-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .q-num {
+            font-weight: 800;
+            color: var(--accent-glow);
+            margin-bottom: 5px;
+        }
+        .correct-ans { color: var(--success-color); font-weight: 700; }
+        .wrong-ans { color: var(--danger-color); font-weight: 700; }
+        .user-ans { color: var(--warning-color); font-weight: 600; white-space: pre-wrap; }
+
+        .certificate-box {
+            border: 3px dashed var(--accent-color);
+            background: rgba(108,92,231,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .certificate-box h2 {
+            justify-content: center;
+            border: none;
+            color: var(--warning-color);
+            font-size: 1.8rem;
+        }
+        .certificate-box .student-name {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 800;
+            margin: 15px 0;
+            text-decoration: underline;
+        }
+        .certificate-box .cert-score {
+            font-size: 1.2rem;
+            color: var(--success-color);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .badge-accent {
+            background: var(--accent-color);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        @media (max-width:768px) {
+            .header-content { flex-direction:column; gap:10px; }
+            .brand-text h1 { font-size:1.3rem; }
+            .logo-img, .instructor-img { width:60px; height:60px; }
+            .card { padding:15px; }
+            .timer-box { top:50px; left:10px; padding:5px 12px; font-size:0.75rem; }
+            .tab-nav .tab-nav-btn { min-width:60px; padding:8px 12px; font-size:0.8rem; }
+            .nav-controls .btn { padding:8px 15px; font-size:0.85rem; }
+            .question-text { font-size:1rem; }
+            .btn-copy { font-size:0.95rem; padding:14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="timer-box" id="timer-box">⏱️ <span id="timer-display">90:00</span></div>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="copy-success" id="copy-success">✅ تم نسخ التقرير إلى الحافظة!</div>
+
+<header>
+    <div class="header-content">
+        <div class="logo-section">
+            <img src="logo1.png" alt="لوجو كودجي" class="logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>🧠 منصة كودجي - مهندس: اندرو مجدي</h1>
+                <p>الاختبار الأسبوعي: طرق اتصال تطبيقات الويب (الوحدة الثالثة)</p>
+            </div>
+            <img src="logo2.png" alt="المهندس أندرو" class="instructor-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E👨‍🏫%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="header-badges">
+            <span class="badge">🌐 الوحدة الثالثة</span>
+            <span class="badge">📡 الدرس الثاني</span>
+            <span class="badge">⏱️ 90 دقيقة</span>
+            <span class="badge">🇪🇬 مصر</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tab-nav" id="main-tabs">
+        <button class="tab-nav-btn active" data-tab="instructions" onclick="switchMainTab('instructions')">📖 تعليمات</button>
+        <button class="tab-nav-btn" data-tab="quiz" onclick="switchMainTab('quiz')">📝 الاختبار الأسبوعي</button>
+        <button class="tab-nav-btn" data-tab="result" onclick="switchMainTab('result')">🏆 النتيجة</button>
+    </div>
+
+    <!-- تبويب التعليمات -->
+    <div class="tab-content active" id="tab-instructions">
+        <section class="card">
+            <h2>📖 تعليمات الاختبار الأسبوعي</h2>
+            <div class="info-block warning">
+                <p style="font-size:1.05rem;line-height:2;">
+                    <strong>📌 مكونات الاختبار:</strong><br>
+                    • <strong>15 سؤال اختيار من متعدد</strong> (من الكتاب المدرسي وكتاب التقييمات)<br>
+                    • <strong>8 أسئلة مقالية</strong> (تغطي نموذج العميل والخادم والـ APIs والرموز)<br><br>
+
+                    <strong>⏱️ مدة الاختبار:</strong> 90 دقيقة<br>
+                    <strong>✅ عدد الأسئلة الكلي:</strong> 23 سؤالاً<br><br>
+
+                    <strong>📝 التعليمات:</strong><br>
+                    1. اقرأ كل سؤال بعناية قبل الإجابة.<br>
+                    2. للاختياري: اختر الإجابة الصحيحة واضغط "تحقق" لمعرفة النتيجة الفورية.<br>
+                    3. للمقالي: اكتب إجابة شاملة ومفصلة في المربع المخصص.<br>
+                    4. بعد الانتهاء، اضغط "تأكيد إنهاء الاختبار وإرسال الإجابات".
+                </p>
+            </div>
+            <button class="btn" style="width:100%;padding:14px;margin-top:10px;" onclick="switchMainTab('quiz')">🚀 ابدأ الاختبار الآن</button>
+        </section>
+    </div>
+
+    <!-- تبويب الاختبار -->
+    <div class="tab-content" id="tab-quiz">
+        <section class="card" id="quiz-setup">
+            <h2>📝 الاختبار الأسبوعي - الدرس الثاني: طرق اتصال تطبيقات الويب</h2>
+            <p style="color:var(--subtext-color);">15 سؤال اختيار من متعدد + 8 أسئلة مقالية (الكتاب المدرسي + التقييمات والأداءات).</p>
+            <div style="margin:15px 0;">
+                <label style="display:block;margin-bottom:6px;font-weight:700;">👤 اسمك الثلاثي:</label>
+                <input type="text" id="student-name-input" placeholder="اكتب اسمك هنا..." style="width:100%;padding:12px;background:var(--bg-color);border:1px solid var(--border-color);border-radius:8px;color:#fff;font-size:1rem;">
+            </div>
+            <button class="btn" style="width:100%;padding:14px;" onclick="startQuiz()">🚀 ابدأ الاختبار الآن</button>
+        </section>
+
+        <section class="card" id="quiz-container" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <h2 id="question-title" style="color:#fffffe;">السؤال 1</h2>
+                <span class="badge badge-accent" id="quiz-progress">1 من 23</span>
+            </div>
+            <div id="dynamic-quiz-area"></div>
+            <div id="feedback-area"></div>
+            <div class="nav-controls">
+                <button class="btn btn-secondary" id="prev-quiz" onclick="navigateQuiz(-1)">السابق</button>
+                <button class="btn" id="check-btn" style="background:var(--accent-color);" onclick="checkCurrentAnswer()">🔍 تحقق</button>
+                <button class="btn btn-secondary" id="next-quiz" onclick="navigateQuiz(1)">التالي</button>
+            </div>
+            <button class="btn btn-success" style="width:100%;margin-top:20px;padding:14px;" onclick="submitQuiz()">✔ تأكيد إنهاء الاختبار وإرسال الإجابات</button>
+        </section>
+    </div>
+
+    <!-- تبويب النتيجة -->
+    <div class="tab-content" id="tab-result">
+        <section class="card" id="result-container" style="display:none;">
+            <h2>🎉 نتيجة الاختبار</h2>
+            <p id="score-summary" style="color:var(--subtext-color);font-size:1.1rem;line-height:2;"></p>
+            <div id="report-details-container" class="report-details"></div>
+            <div class="certificate-box" id="certificate">
+                <h2>📜 شهادة إتمام</h2>
+                <p>تشهد منصة كودجي بأن الطالب/الطالبة:</p>
+                <div class="student-name" id="cert-name">—</div>
+                <p>قد أتم بنجاح اختبار <b>الدرس الثاني: طرق اتصال تطبيقات الويب (الوحدة الثالثة)</b></p>
+                <p class="cert-score" id="cert-score">🌟 النتيجة: 0%</p>
+                <div style="margin-top:25px;font-size:0.85rem;color:var(--subtext-color);">📅 تم التقييم آلياً بواسطة منصة كودجي 🤖</div>
+            </div>
+
+            <div style="margin-top:25px;">
+                <button class="btn btn-copy" onclick="copyReportToClipboard()">
+                    📋 انسخ التقرير وارسله عبر الواتساب لمهندس أندرو 01285529570
+                </button>
+                <div class="whatsapp-hint">
+                    <span>💡</span>
+                    بعد الضغط على الزر، اذهب إلى واتساب وألصق التقرير (Paste) وأرسله للمهندس أندرو
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+                <button class="btn btn-secondary" onclick="location.reload()">🔄 إعادة الاختبار</button>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // أسئلة الاختبار (15 اختياري + 8 مقالي)
+    // ============================================================
+    const mcqQuestions = [
+        { q: "ما الجانب الذي يطلب البيانات أو المعالجة من الخادم في تطبيقات الويب؟",
+          opts: ["الخادم (Server)", "العميل (Client)", "قاعدة البيانات (Database)", "واجهة برمجة التطبيقات (API)"], ans: 1 },
+        { q: "الجانب الذي يستقبل الطلبات من العملاء، ويعالجها بناءً على القواعد، ويُعيد الاستجابة المناسبة هو:",
+          opts: ["العميل (Client)", "الخادم (Server)", "متصفح الويب (Browser)", "شبكة الاتصال"], ans: 1 },
+        { q: "ما البروتوكول المُعتمد لنقل رسائل الويب عبر اتصال TLS مُشفر وآمن؟",
+          opts: ["HTTP", "HTTPS", "FTP", "DNS"], ans: 1 },
+        { q: "أي من طرق طلب HTTP تُستخدم عادةً لطلب مورد أو استرجاع بيانات من الخادم دون تعديلها؟",
+          opts: ["POST", "GET", "DELETE", "PUT"], ans: 1 },
+        { q: "عند إرسال بيانات حساسّة مثل إدخال نموذج تسجيل الدخول (اسم المستخدم وكلمة المرور)، يُفضل استخدام طريقة الطلب:",
+          opts: ["GET", "POST", "200", "404"], ans: 1 },
+        { q: "ما المعنى الدقيق لرمز حالة HTTP رقم 200 الصادر عن الخادم؟",
+          opts: ["المورد غير موجود", "نجاح الطلب وإعادة الاستجابة بنجاح", "خطأ داخلي في الخادم", "غير مصرح بالوصول"], ans: 1 },
+        { q: "يُعيد الخادم رمز حالة HTTP رقم 404 عندما:",
+          opts: ["تنجح معالجة الطلب", "يكون المورد أو الصفحة المطلوبة غير موجودة", "حدث خطأ برمجي داخلي في الخادم", "يتم تشفير البيانات"], ans: 1 },
+        { q: "ما رمز حالة HTTP الذي يشير إلى وقوع خطأ داخلي في الخادم يمنعه من إكمال المعالجة؟",
+          opts: ["200", "404", "500", "302"], ans: 2 },
+        { q: "القواعد والواجهات المحددة التي تتيح لبرنامج أو خدمة ويب طلب بيانات أو وظائف من برنامج آخر تُسمى:",
+          opts: ["قاعدة البيانات", "واجهة برمجة التطبيقات (API)", "بروتوكول TLS", "الواجهة الأمامية"], ans: 1 },
+        { q: "ما الصيغة النصية الشائعة المُستخدمة لتمثيل البيانات المهيكلة في شكل كائنات ومصفوفات لتبادلها عبر الـ API؟",
+          opts: ["HTML", "JSON", "SQL", "CSS"], ans: 1 },
+        { q: "النموذج الذي ينظم التبادل المباشر حيث يرسل العميل الطلب فيرد الخادم بالاستجابة يُعرف بـ:",
+          opts: ["دورة الطلب والاستجابة (Request/Response)", "التشفير المتماثل", "المعالجة المتوازية", "الاتصال اللاسلكي"], ans: 0 },
+        { q: "الميزة الرئيسية لاستخدام بروتوكول HTTPS بدلاً من HTTP هي:",
+          opts: ["أنه يعمل بدون اتصال بالإنترنت", "حماية البيانات بتشفير TLS ومصادقة هوية الخادم", "إلغاء الحاجة لقواعد البيانات", "تسريع المعالج"], ans: 1 },
+        { q: "في كائن JSON التالي: {\"city\": \"Cairo\", \"temperature\": 31}، العنصر \"city\" يمثل:",
+          opts: ["المفتاح (Key)", "القيمة (Value)", "المصفوفة (Array)", "رمز الحالة"], ans: 0 },
+        { q: "عند بناء تطبيق طقس يطلب درجات الحرارة من خادم خارجي لعرضها، تُستخدم طريقة الطلب:",
+          opts: ["POST", "GET", "500", "404"], ans: 1 },
+        { q: "السبب الرئيسي لاختيار صيغة JSON لتبادل البيانات بين التطبيقات عبر الـ API هو:",
+          opts: ["أنها تشفر البيانات تلقائياً", "أنها صيغة نصية خفيفة وقابلة للقراءة وتدعمها معظم لغات البرمجة", "أنها تحسن ألوان الشاشة", "أنها تلغي الحاجة للخادم"], ans: 1 }
+    ];
+
+    const essayQuestions = [
+        { q: "اشرح نموذج العميل والخادم (Client / Server)، ووضح دور كل منهما في تطبيقات الويب." },
+        { q: "وضح بالخطوات دورة الطلب والاستجابة (Request / Response) عند فتح صفحة ويب." },
+        { q: "علل: لماذا يجب استخدام بروتوكول HTTPS بدلاً من HTTP عند إدخال البيانات الحساسة مثل تسجيل الدخول؟" },
+        { q: "قارن بين طريقة الطلب GET وطريقة الطلب POST من حيث الاستخدام وظهور البيانات في الرابط." },
+        { q: "فسر معاني رموز حالة HTTP التالية: (200 - 404 - 500) موضحاً ما يعنيه كل رمز." },
+        { q: "ما هي واجهة برمجة التطبيقات (API)؟ وكيف تساهم في التكامل بين تطبيقات الويب المختلفة؟" },
+        { q: "اشرح مفهوم صيغة JSON وكيف تنظم البيانات باستخدام المفتاح (Key) والقيمة (Value) مع كتابة مثال بسيط." },
+        { q: "صمم طريقة اتصال مناسبة لتطبيق ويب لمدرسة (عرض الجدول الدراسي، وإرسال نموذج تسجيل طالب جديد) موضحاً خياراتك للبروتوكول وطرق الطلب مع التعليل." }
+    ];
+
+    // ============================================================
+    // متغيرات الحالة
+    // ============================================================
+    let studentName = '';
+    let currentQuizIndex = 0;
+    const totalQuestions = mcqQuestions.length + essayQuestions.length;
+    let mcqAnswers = new Array(mcqQuestions.length).fill(null);
+    let essayAnswers = new Array(essayQuestions.length).fill('');
+    let timerInterval = null;
+    let timeLeft = 5400; // 90 mins
+
+    // ============================================================
+    // التنقل بين التبويبات
+    // ============================================================
+    function switchMainTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-nav-btn[data-tab="${tab}"]`).classList.add('active');
+    }
+
+    function updateProgressBar() {
+        let answered = 0;
+        mcqAnswers.forEach(ans => { if (ans !== null) answered++; });
+        essayAnswers.forEach(ans => { if ((ans || '').trim().length >= 5) answered++; });
+        const pct = Math.min(100, (answered / totalQuestions) * 100);
+        document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    // ============================================================
+    // إدارة الاختبار
+    // ============================================================
+    function startQuiz() {
+        const nameInput = document.getElementById('student-name-input');
+        if (!nameInput.value.trim()) {
+            alert('⚠️ برجاء إدخال اسمك الثلاثي لتبدأ الاختبار');
+            return;
+        }
+        studentName = nameInput.value.trim();
+        document.getElementById('quiz-setup').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('timer-box').style.display = 'block';
+
+        if (timerInterval) clearInterval(timerInterval);
+        timeLeft = 5400;
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timer-display').textContent =
+                (mins < 10 ? '0' + mins : mins) + ':' + (secs < 10 ? '0' + secs : secs);
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert('⏰ انتهى وقت الاختبار! سيتم تقديم إجاباتك الآن.');
+                submitQuiz();
+            }
+        }, 1000);
+
+        loadQuestion(0);
+    }
+
+    function loadQuestion(index) {
+        currentQuizIndex = index;
+        document.getElementById('question-title').textContent = `السؤال ${index + 1} من ${totalQuestions}`;
+        document.getElementById('quiz-progress').textContent = `${index + 1} من ${totalQuestions}`;
+
+        const area = document.getElementById('dynamic-quiz-area');
+        const feedback = document.getElementById('feedback-area');
+        feedback.innerHTML = '';
+
+        if (index < mcqQuestions.length) {
+            // سؤال اختياري
+            const q = mcqQuestions[index];
+            let html = `<div class="question-text"><span class="badge badge-accent">اختياري</span> ${q.q}</div>`;
+            html += `<ul class="options-list">`;
+            q.opts.forEach((opt, oi) => {
+                const checked = mcqAnswers[index] === oi ? 'checked' : '';
+                html += `
+                    <li class="option-item" onclick="selectOption(${index}, ${oi})" id="opt-item-${index}-${oi}">
+                        <input type="radio" name="quiz-mcq-${index}" id="radio-${index}-${oi}" value="${oi}" ${checked}>
+                        <label for="radio-${index}-${oi}" style="cursor:pointer;width:100%;">${opt}</label>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+            area.innerHTML = html;
+            document.getElementById('check-btn').style.display = 'inline-flex';
+        } else {
+            // سؤال مقالي
+            const essayIdx = index - mcqQuestions.length;
+            const q = essayQuestions[essayIdx];
+            const answerVal = essayAnswers[essayIdx] || '';
+            let html = `<div class="question-text"><span class="badge badge-accent">مقالي</span> ${q.q}</div>`;
+            html += `<textarea class="essay-textarea" id="essay-input-${essayIdx}" placeholder="اكتب إجابتك النموذجية المفصلة هنا..." oninput="saveEssayAnswer(${essayIdx}, this.value)">${answerVal}</textarea>`;
+            area.innerHTML = html;
+            document.getElementById('check-btn').style.display = 'none';
+        }
+
+        document.getElementById('prev-quiz').disabled = (index === 0);
+        document.getElementById('next-quiz').disabled = (index === totalQuestions - 1);
+        updateProgressBar();
+    }
+
+    function selectOption(qIdx, optIdx) {
+        mcqAnswers[qIdx] = optIdx;
+        document.querySelectorAll('#dynamic-quiz-area .option-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-area').innerHTML = '';
+        updateProgressBar();
+    }
+
+    function checkCurrentAnswer() {
+        if (currentQuizIndex >= mcqQuestions.length) return;
+        const q = mcqQuestions[currentQuizIndex];
+        const selected = mcqAnswers[currentQuizIndex];
+        const fb = document.getElementById('feedback-area');
+
+        if (selected === null || selected === undefined) {
+            fb.innerHTML = `<div class="feedback-msg wrong">⚠️ برجاء اختيار إجابة أولاً.</div>`;
+            return;
+        }
+
+        const isCorrect = selected === q.ans;
+        document.querySelectorAll('#dynamic-quiz-area .option-item').forEach((item, idx) => {
+            item.classList.remove('correct', 'wrong');
+            if (idx === q.ans) item.classList.add('correct');
+            else if (idx === selected && !isCorrect) item.classList.add('wrong');
+        });
+
+        if (isCorrect) {
+            fb.innerHTML = `<div class="feedback-msg correct">🎉 إجابة صحيحة! أحسنت.</div>`;
+        } else {
+            fb.innerHTML = `<div class="feedback-msg wrong">❌ إجابة خاطئة. الإجابة الصحيحة هي: ${q.opts[q.ans]}</div>`;
+        }
+    }
+
+    function saveEssayAnswer(essayIdx, val) {
+        essayAnswers[essayIdx] = val;
+        updateProgressBar();
+    }
+
+    function navigateQuiz(delta) {
+        const newIdx = currentQuizIndex + delta;
+        if (newIdx >= 0 && newIdx < totalQuestions) {
+            loadQuestion(newIdx);
+        }
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        document.getElementById('timer-box').style.display = 'none';
+
+        let mcqCorrect = 0;
+        let mcqAnswered = 0;
+        mcqQuestions.forEach((q, i) => {
+            if (mcqAnswers[i] !== null) mcqAnswered++;
+            if (mcqAnswers[i] === q.ans) mcqCorrect++;
+        });
+
+        let essayAnswered = 0;
+        essayAnswers.forEach(ans => {
+            if ((ans || '').trim().length >= 5) essayAnswered++;
+        });
+
+        const mcqPct = Math.round((mcqCorrect / mcqQuestions.length) * 100);
+        const essayPct = Math.round((essayAnswered / essayQuestions.length) * 100);
+        const overall = Math.round((mcqPct + essayPct) / 2);
+
+        document.getElementById('score-summary').innerHTML = `
+            📊 <b style="color:#fff;">النتيجة الإجمالية:</b> ${overall}%<br>
+            📝 الجزء الاختياري: ${mcqCorrect}/${mcqQuestions.length} (${mcqPct}%)<br>
+            ✍️ الجزء المقالي: تم الإجابة على ${essayAnswered} من ${essayQuestions.length} أسئلة (${essayPct}%)
+        `;
+
+        let reportHTML = `<h3 style="color:#fff;">📋 تفاصيل إجابات التقرير الشامل</h3>`;
+
+        reportHTML += `<h4 style="color:var(--accent-glow);margin:15px 0 10px 0;">📝 الاختياري (${mcqQuestions.length} سؤال)</h4>`;
+        mcqQuestions.forEach((q, idx) => {
+            const userAns = mcqAnswers[idx];
+            const isCorrect = userAns === q.ans;
+            const correctText = q.opts[q.ans];
+            const userText = userAns !== null ? q.opts[userAns] : 'لم يجب';
+            reportHTML += `
+                <div class="q-item">
+                    <div class="q-num">س${idx + 1}: ${q.q}</div>
+                    <div>📌 الإجابة الصحيحة: <span class="correct-ans">${correctText}</span></div>
+                    <div>👤 إجابتك: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${userText}</span> ${isCorrect ? '✅' : '❌'}</div>
+                </div>
+            `;
+        });
+
+        reportHTML += `<h4 style="color:var(--accent-glow);margin:20px 0 10px 0;">✍️ المقالي (${essayQuestions.length} أسئلة)</h4>`;
+        essayQuestions.forEach((q, idx) => {
+            const answer = essayAnswers[idx] || 'لم يجب';
+            reportHTML += `
+                <div class="q-item">
+                    <div class="q-num">س${idx + 1}: ${q.q}</div>
+                    <div>👤 إجابتك: <span class="user-ans">${answer}</span></div>
+                </div>
+            `;
+        });
+
+        document.getElementById('report-details-container').innerHTML = reportHTML;
+        document.getElementById('cert-name').textContent = studentName || 'طالب منصة كودجي';
+        document.getElementById('cert-score').textContent = `🌟 النتيجة: ${overall}%`;
+        document.getElementById('result-container').style.display = 'block';
+
+        window._quizResultData = {
+            mcqCorrect, mcqAnswered, mcqTotal: mcqQuestions.length, mcqPct,
+            essayAnswered, essayTotal: essayQuestions.length, essayPct, overall
+        };
+
+        switchMainTab('result');
+    }
+
+    // ============================================================
+    // نسخ التقرير للواتساب
+    // ============================================================
+    function copyReportToClipboard() {
+        const data = window._quizResultData || {};
+        let lines = [];
+        lines.push(`مرحباً مهندس أندرو 👋`);
+        lines.push('');
+        lines.push(`الطالب/الطالبة: ${studentName || 'طالب منصة كودجي'}`);
+        lines.push(`الاختبار الأسبوعي: طرق اتصال تطبيقات الويب (الوحدة الثالثة)`);
+        lines.push(`📊 النتيجة النهائية: ${data.overall || 0}%`);
+        lines.push('');
+        lines.push(`📝 الاختياري: ${data.mcqCorrect || 0}/${data.mcqTotal || 0} (${data.mcqPct || 0}%)`);
+        lines.push(`✍️ المقالي: ${data.essayAnswered || 0}/${data.essayTotal || 0} (${data.essayPct || 0}%)`);
+        lines.push('');
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        lines.push(`📝 إجابات الأسئلة الاختيارية:`);
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        mcqQuestions.forEach((q, idx) => {
+            const userAns = mcqAnswers[idx];
+            const isCorrect = userAns === q.ans;
+            const correctText = q.opts[q.ans];
+            const userText = userAns !== null ? q.opts[userAns] : 'لم يجب';
+            lines.push(`س${idx + 1}: ${q.q}`);
+            lines.push(`   صح: ${correctText} | إجابتي: ${userText} ${isCorrect ? '✅' : '❌'}`);
+        });
+        lines.push('');
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        lines.push(`✍️ إجابات الأسئلة المقالية:`);
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        essayQuestions.forEach((q, idx) => {
+            const answer = essayAnswers[idx] || 'لم يجب';
+            lines.push(`س${idx + 1}: ${q.q}`);
+            lines.push(`   إجابتي: ${answer}`);
+        });
+        lines.push('');
+        lines.push(`تم التقييم بواسطة منصة كودجي 🤖`);
+        lines.push(`📅 ${new Date().toLocaleDateString('ar-EG')}`);
+
+        const fullReport = lines.join('\n');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullReport).then(showCopyToast).catch(() => fallbackCopy(fullReport));
+        } else {
+            fallbackCopy(fullReport);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showCopyToast(); } catch (e) { alert('❌ فشل النسخ'); }
+        document.body.removeChild(ta);
+    }
+
+    function showCopyToast() {
+        const el = document.getElementById('copy-success');
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    // ============================================================
+    // أحداث الصفحة
+    // ============================================================
+    window.addEventListener('scroll', function() {
+        const btn = document.getElementById('scroll-top');
+        if (window.scrollY > 400) btn.style.display = 'block';
+        else btn.style.display = 'none';
+    });
+
+    window.switchMainTab = switchMainTab;
+    window.startQuiz = startQuiz;
+    window.selectOption = selectOption;
+    window.checkCurrentAnswer = checkCurrentAnswer;
+    window.saveEssayAnswer = saveEssayAnswer;
+    window.navigateQuiz = navigateQuiz;
+    window.submitQuiz = submitQuiz;
+    window.copyReportToClipboard = copyReportToClipboard;
+</script>
+
+</body>
+</html>
